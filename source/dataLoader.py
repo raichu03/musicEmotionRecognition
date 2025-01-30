@@ -5,10 +5,10 @@ import torch
 import torchaudio
 from torch.utils.data import Dataset
 
-### Datase Loader ###
+### Train Datase Loader ###
 def load_dataset(data_dir: str, save_label_map_path=None):
     """
-    Loads the dataset form the directory and creates a label map.
+    Loads the dataset for training form the directory and creates a label map.
     Args:
         data_dir: str: Path to the directory containing the dataset.
         save_label_map_path: str: Path to save the label map.
@@ -36,6 +36,36 @@ def load_dataset(data_dir: str, save_label_map_path=None):
     
     return file_paths, labels
 
+### Test Datase Loader ###
+def test_dataset(data_dir: str, label_map_path=None):
+    """
+    Loads the dataset for training form the directory and creates a label map.
+    Args:
+        data_dir: str: Path to the directory containing the dataset.
+        save_label_map_path: str: Path to save the label map.
+        Returns: 
+            dataset: list: List of tuples containing the audio file path and the corresponding label.
+            label_map: dict: Dictionary containing the mapping of labels to integers.
+    """
+    file_paths = []
+    labels = []
+    
+    with open(label_map_path, 'r') as f:
+        label_map = json.load(f)
+        
+    for folder in os.listdir(data_dir):
+        folder_path = os.path.join(data_dir, folder)
+        if os.path.isdir(folder_path):
+            if folder not in label_map:
+                print(f"Skipping folder '{folder}' as it is not in the label map.")
+                continue
+            for file in os.listdir(folder_path):
+                if file.endswith(".wav"):
+                    file_paths.append(os.path.join(folder_path, file))
+                    labels.append(label_map[folder])
+    
+    return file_paths, labels
+    
 class AudioDataset(Dataset):
     
     def __init__(self, file_paths, labels, processor, target_length=30000):

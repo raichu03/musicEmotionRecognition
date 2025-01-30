@@ -107,7 +107,7 @@ def main(data_dir, batch_size, epochs, label_map_path=None):
     print(f"Training on {device}")
     
     best_val_loss = float('inf')
-    best_model_path = "models/best_model.pt"
+    model_path = "models/best_model.pt"
     
     train_losses = []
     val_losses = []
@@ -130,16 +130,50 @@ def main(data_dir, batch_size, epochs, label_map_path=None):
         
         if val_loss < best_val_loss:  # Save based on validation loss
             best_val_loss = val_loss
-            torch.save(model.state_dict(), best_model_path)
-            print(f"Best model saved with Validation Loss: {val_loss:.4f}")
+            torch.save({
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'epoch': epoch,
+                'train_losses': train_losses,
+                'val_losses': val_losses,
+                'val_accuracies': val_accuracies,
+            }, model_path)
     
-    print(f"Training complete. Best model saved at {best_model_path} with Validation Loss: {best_val_loss:.4f}")
+    print(f"Training complete. Best model saved at {model_path} with Validation Loss: {best_val_loss:.4f}")
+    
+    # Save metrics to file or display graph
+    plt.figure(figsize=(10, 5))
+
+    # Plot training and validation loss
+    plt.subplot(1, 2, 1)
+    plt.plot(range(1, len(train_losses) + 1), train_losses, label="Training Loss")
+    plt.plot(range(1, len(val_losses) + 1), val_losses, label="Validation Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Loss Over Epochs")
+    plt.legend()
+
+    # Plot validation accuracy
+    plt.subplot(1, 2, 2)
+    plt.plot(range(1, len(val_accuracies) + 1), val_accuracies, label="Validation Accuracy")
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
+    plt.title("Validation Accuracy Over Epochs")
+    plt.legend()
+
+    plt.tight_layout()
+    
+    plt.savefig("metrics_plot.png", dpi=300)
+    plt.close()
+    
+    print("Training complete")
             
             
 if __name__ == "__main__":
-    data_dir = "../data/train"
-    batch_size = 4
-    epochs = 5
-    label_map_path = "label_map.json"
+    
+    data_dir = "" #Path to the data directory
+    batch_size = 0 #Batch size for training
+    epochs = 0 #Number of epochs
+    label_map_path = "" #Path to the label map
     main(data_dir, batch_size, epochs, label_map_path) 
  
