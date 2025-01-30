@@ -39,7 +39,7 @@ def load_dataset(data_dir: str, save_label_map_path=None):
 ### Test Datase Loader ###
 def test_dataset(data_dir: str, label_map_path=None):
     """
-    Loads the dataset for training form the directory and creates a label map.
+    Loads the dataset for testing form the directory and creates a label map.
     Args:
         data_dir: str: Path to the directory containing the dataset.
         save_label_map_path: str: Path to save the label map.
